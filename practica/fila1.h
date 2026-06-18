@@ -1,8 +1,8 @@
 #include <iostream>
 using namespace std;
 
-typedef char item;
-const item indefinido = '@';
+typedef int item;
+const item indefinido = '-999999';
 
 // implementacion del adt FILA
 // FIFO: first in, first out
@@ -93,7 +93,7 @@ void defila(fila &f){
 // DEFILARN: FILA x ENTERO -> FILA
 // elimina los primeros n elementos de la fila
 void defilarN(fila &f, int n){
-    if(n<0 && n>f.longitud){
+    if(n<0 || n>longitud(f)){
         return;
     }
     nodo *borrar = f.frente;
@@ -133,14 +133,14 @@ void singular(fila &f){
 
 // FUNCIONES COMO USUARIO
 // LONGITUD de fila - funcion recursiva
-int longitud(fila &f){
+int longitudFila(fila &f){
     if(esFilaVacia(f)){
         return 0;
     }else{
-        item frenteF = frente(f);
+        item x = frente(f);
         defila(f);
-        int l  = longitud(f);
-        enFila(f, frenteF);
+        int l  = longitudFila(f);
+        enFila(f, x);
         return l + 1;
     }
 }
@@ -155,6 +155,10 @@ int longitudF(fila &f){
         defila(f);
         enFila(filaAux, i);
         l++;
+    }
+    while(!esFilaVacia(filaAux)){
+        enFila(f, frente(filaAux));
+        defila(filaAux);
     }
     return l;
 }
@@ -175,7 +179,7 @@ bool perteneceF(fila &f, item i){
     bool encontrado = false;
     fila filaAux;
     filaVacia(filaAux);
-    while(!esFilaVacia){
+    while(!esFilaVacia(f)){
         item x =  frente(f);
         if(x == i){
             encontrado = true;
@@ -239,5 +243,187 @@ bool igualesF(fila &f1, fila &f2){
     }
 
     return i;
-}                  
+}
 
+// concatenar filas, funcion recursiva
+void concat(fila &f1, fila &f2){
+    if(esFilaVacia(f1)){
+        return;
+    }
+    enFila(f2, frente(f1));
+    defila(f1);
+    return(concat(f1, f2));
+}
+
+// concatenar filas, funcion iterativa
+void concatenarF(fila &f1, fila &f2){
+    while(!esFilaVacia(f1)){
+        enFila(f2, frente(f1));
+        defila(f1);
+    }
+}
+
+// invertir fila, funcion recursiva
+void invertir(fila &f, fila &finv){
+    if(!esFilaVacia(f)){
+        item x = fondo(f);
+        enFila(finv, x);
+        invertir(f, finv);
+        enFila(finv, x);
+    }
+}
+
+// invertir fila, funcion iterativa
+void invertirF(fila &f){
+    int LF = longitud(f) - 1;
+    int n=0;
+    while(n!=(LF)){
+        item aux = frente(f);
+        defila(f);
+        enFila(f, aux);
+    }
+}
+
+// contar pares, funcion recursiva
+int contPares(fila &f){
+    if(esFilaVacia(f)){
+        return 0;
+    }
+    item aux = frente(f);
+    defila(f);
+    int pares = contPares(f);
+    enFila(f, aux);
+    if(aux % 2 == 0){
+        return pares +1 ;
+    }else{
+        return pares;
+    }
+}
+
+// contar pares, funcion iterativa
+int contarPares(fila &f){
+    fila aux;
+    filaVacia(aux);
+    int par = 0;
+    while(!esFilaVacia(f)){
+        item x = frente(f);
+        defila(f);
+        if(x % 2 == 0){
+            par++;
+        }
+        enFila(aux, x);
+    }
+    while(!esFilaVacia(aux)){
+        enFila(f, frente(aux));
+        defila(aux);
+    }
+    return par;
+}
+
+// cuenta los numeros impares de la fila, funcion recursiva
+int contImp(fila &f){
+    if(esFilaVacia(f)){
+        return 0;
+    }
+    item x = frente(f);
+    defila(f);
+    int impares = contImp(f);
+    enFila(f, x);
+    if(x % 2 != 0){
+        return impares + 1;
+    }else{
+        return impares;
+    }
+}
+
+// cuenta los numeros impares, funcion iterativa
+int contarImpares(fila &f){
+    int impar = 0;
+    fila aux;
+    filaVacia(aux);
+    while(!esFilaVacia(f)){
+        item x = frente(f);
+        defila(f);
+        if(x % 2!=0){
+            impar++;
+        }
+        enFila(aux, x);
+    }
+    while(!esFilaVacia(aux)){
+        enFila(f, frente(aux));
+        defila(aux);
+    }
+    return impar;
+}
+
+// suma todos los elementos de la fila funcion  recursiva
+
+int sumarE(fila &f){
+    if(esFilaVacia(f)){
+        return 0;
+    }
+    item s = frente(f);
+    defila(f);
+    int suma = sumarE(f);
+    enFila(f, s);
+    return suma + s;
+}
+
+// suma todos los elementos funcion iterativa
+int sumarElementos(fila &f){
+    int sumar =0;
+    fila aux;
+    filaVacia(aux);
+    while(!esFilaVacia(f)){
+        item x = frente(f);
+        defila(f);
+        sumar += x;
+        enFila(aux, x);
+        
+    }
+    while(!esFilaVacia(aux)){
+        enFila(f, frente(aux));
+        defila(aux);
+    }
+    return sumar;
+}
+
+int mayorE(fila &f){
+    if(esFilaVacia(f)){
+        return indefinido;
+    }
+    item x = frente(f);
+    defila(f);
+    int esMayor = mayorE(f);
+    if(x > esMayor){
+        return x;
+    }
+    return esMayor;
+}
+
+// funcion iterativa
+int mayorElemen(fila &f){
+    if(esFilaVacia(f)){
+        return indefinido;
+    }
+    int mayorn=frente(f);
+    fila filaux;
+    filaVacia(filaux);
+    while(!esFilaVacia(f)){
+        item x = frente(f);
+        defila(f);
+        if(x > mayorn){
+            mayorn = x;
+        }
+        enFila(filaux, x);
+    }
+    while(!esFilaVacia(filaux)){
+        enFila(f, frente(filaux));
+        defila(filaux);
+    }
+    return mayorn;
+}
+
+void linea(){
+    cout << "---------------------"<<endl;
+}
